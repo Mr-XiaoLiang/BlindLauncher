@@ -1,4 +1,4 @@
-package com.lollipop.base.util
+package com.lollipop.blindlauncher.utils
 
 import android.app.Activity
 import android.graphics.Color
@@ -10,7 +10,6 @@ import android.view.WindowManager
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.lollipop.base.util.WindowInsetsHelper.EdgeStrategy.*
 import kotlin.math.max
 
 /**
@@ -144,16 +143,16 @@ class WindowInsetsHelper(
 
         private fun getNewValue(insets: Int, original: Int, s: EdgeStrategy): Int {
             return when (s) {
-                ORIGINAL -> {
+                EdgeStrategy.ORIGINAL -> {
                     original
                 }
-                ACCUMULATE -> {
+                EdgeStrategy.ACCUMULATE -> {
                     insets + original
                 }
-                COMPARE -> {
+                EdgeStrategy.COMPARE -> {
                     max(insets, original)
                 }
-                INSETS -> {
+                EdgeStrategy.INSETS -> {
                     insets
                 }
             }
@@ -179,11 +178,26 @@ class WindowInsetsHelper(
         val bottom: EdgeStrategy
     ) {
         companion object {
-            val ALL = Edge(left = COMPARE, top = COMPARE, right = COMPARE, bottom = COMPARE)
+            val ALL = Edge(
+                left = EdgeStrategy.COMPARE,
+                top = EdgeStrategy.COMPARE,
+                right = EdgeStrategy.COMPARE,
+                bottom = EdgeStrategy.COMPARE
+            )
 
-            val HEADER = Edge(left = COMPARE, top = COMPARE, right = COMPARE, bottom = ORIGINAL)
+            val HEADER = Edge(
+                left = EdgeStrategy.COMPARE,
+                top = EdgeStrategy.COMPARE,
+                right = EdgeStrategy.COMPARE,
+                bottom = EdgeStrategy.ORIGINAL
+            )
 
-            val CONTENT = Edge(left = COMPARE, top = ORIGINAL, right = COMPARE, bottom = COMPARE)
+            val CONTENT = Edge(
+                left = EdgeStrategy.COMPARE,
+                top = EdgeStrategy.ORIGINAL,
+                right = EdgeStrategy.COMPARE,
+                bottom = EdgeStrategy.COMPARE
+            )
         }
 
         fun baseTo(

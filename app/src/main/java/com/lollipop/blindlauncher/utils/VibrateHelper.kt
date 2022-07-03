@@ -1,4 +1,4 @@
-package com.lollipop.blindlauncher
+package com.lollipop.blindlauncher.utils
 
 import android.content.Context
 import android.os.Build

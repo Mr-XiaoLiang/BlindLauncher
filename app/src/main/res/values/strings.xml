@@ -4,4 +4,6 @@
     <string name="app_list_ready">应用列表数据准备就绪</string>
     <string name="tts_not_support_chinese">TTS not support, 文字转语音不被支持</string>
     <string name="tts_init_error">TTS文字转语音出错，可能设备不支持</string>
+
+    <string name="app_selected_none">应用未选中</string>
 </resources>
