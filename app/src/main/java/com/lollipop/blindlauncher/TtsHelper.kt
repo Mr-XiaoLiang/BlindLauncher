@@ -19,11 +19,15 @@ class TtsHelper(
     var isActive = false
         private set
 
-    fun say(text: String) {
+    fun say(text: Int, clear: Boolean = true) {
+        say(context.getString(text), clear)
+    }
+
+    fun say(text: String, clear: Boolean = true) {
         if (!isActive || text.isEmpty()) {
             return
         }
-        if (tts.isSpeaking) {
+        if (tts.isSpeaking && clear) {
             tts.stop()
         }
         val textLength = text.length
@@ -34,7 +38,7 @@ class TtsHelper(
             speakIndex = speakEnd
             tts.speak(
                 content,
-                if (speakIndex == 0) {
+                if (speakIndex == 0 && clear) {
                     TextToSpeech.QUEUE_FLUSH
                 } else {
                     TextToSpeech.QUEUE_ADD
