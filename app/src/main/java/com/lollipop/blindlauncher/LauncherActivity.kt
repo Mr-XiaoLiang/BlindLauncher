@@ -44,9 +44,9 @@ class LauncherActivity : AppCompatActivity(), TtsHelper.OnInitListener,
         // 震动表示就绪
         vibrateHelper.startUp(VibrateHelper.Vibrate.SELECTED)
 
-        binding.root.postDelayed({ selectedApp(1) }, 3000)
+//        binding.root.postDelayed({ selectedApp(1) }, 3000)
 
-        binding.root.postDelayed({ appLaunchHelper.launch(selectedApp) }, 6000)
+//        binding.root.postDelayed({ appLaunchHelper.launch(selectedApp) }, 6000)
     }
 
     private fun selectedApp(index: Int) {

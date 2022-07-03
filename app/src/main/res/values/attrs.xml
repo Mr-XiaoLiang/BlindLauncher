@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RotaryView">
+        <attr name="runwayWidth" format="dimension" />
+        <attr name="runwayBackground" format="color" />
+        <attr name="runwayColor" format="color" />
+        <attr name="offsetWeight" format="float" />
+        <attr name="partitionsCount" format="integer" />
+    </declare-styleable>
+</resources>
