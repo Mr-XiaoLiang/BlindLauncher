@@ -37,7 +37,7 @@ class VibrateHelper(
     enum class Vibrate(val timings: LongArray, val amplitudes: IntArray) {
         TOUCH_DOWN(longArrayOf(0, 50), intArrayOf(0, 128)),
         TOUCH_UP(longArrayOf(0, 50), intArrayOf(0, 128)),
-        SELECTED(longArrayOf(0, 100, 50, 50), intArrayOf(0, 128, 0, 128)),
+        SELECTED(longArrayOf(0, 100, 100, 50), intArrayOf(0, 255, 0, 128)),
         COMPLETE(longArrayOf(0, 100, 100, 100, 100, 100), intArrayOf(0, 128, 0, 128, 0, 128))
     }
 

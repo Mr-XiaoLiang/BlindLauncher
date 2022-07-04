@@ -18,6 +18,12 @@ class AppLaunchHelper(
         const val ACTION_VOICE_OFF = "ACTION_VOICE_OFF"
     }
 
+    /**
+     * 已选中的Index
+     */
+    private var selectedIndex = -1
+    private var selectedApp: AppInfo? = null
+
     private val db = Room.databaseBuilder(
         context.applicationContext,
         AppUsageDatabase::class.java, "app_usage_database"
@@ -57,15 +63,18 @@ class AppLaunchHelper(
                 it.launchCount = findLaunchCount(allUsage, it.pkgName)
             }
             synchronized(appInfoList) {
-                appInfoList.sortBy { it.launchCount }
+                appInfoList.sortBy { 0 - it.launchCount }
             }
+            selectedIndex = -1
+            selectedApp = null
             onUI {
                 listener.onAppListSortChanged()
             }
         }
     }
 
-    fun launch(info: AppInfo?): LaunchResult {
+    fun launch(): LaunchResult {
+        val info = selectedApp
         info ?: return LaunchResult.APP_NOT_FOUND
         return when (info.pkgName) {
             ACTION_VOICE_OFF -> {
@@ -98,6 +107,42 @@ class AppLaunchHelper(
         return list.find { it.packageName == pkgName }?.launchCount ?: 0
     }
 
+    private fun selectedApp(index: Int) {
+        if (selectedIndex != index) {
+            selectedIndex = index
+            selectedApp = if (index in 0 until size) {
+                val appInfo = this[index]
+                appInfo
+            } else {
+                null
+            }
+            listener.onAppSelected(selectedApp)
+        }
+    }
+
+    fun selectLast() {
+        onPartitionsChange(selectedIndex - 1)
+    }
+
+    fun selectNext() {
+        onPartitionsChange(selectedIndex + 1)
+    }
+
+    private fun onPartitionsChange(index: Int) {
+        var newIndex = index
+        if (isEmpty()) {
+            newIndex = -1
+        } else {
+            if (newIndex < 0) {
+                newIndex = size - 1
+            }
+            if (newIndex > size - 1) {
+                newIndex = 0
+            }
+        }
+        selectedApp(newIndex)
+    }
+
     class AppInfo(
         val pkgName: String,
         val label: String,
@@ -112,6 +157,7 @@ class AppLaunchHelper(
 
     interface Listener {
         fun onAppListSortChanged()
+        fun onAppSelected(info: AppInfo?)
         fun callVoiceOff()
     }
 
