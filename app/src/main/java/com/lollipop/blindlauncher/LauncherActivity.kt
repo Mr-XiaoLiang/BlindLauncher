@@ -1,6 +1,7 @@
 package com.lollipop.blindlauncher
 
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.blindlauncher.databinding.ActivityLauncherBinding
 import com.lollipop.blindlauncher.utils.*
@@ -8,7 +9,7 @@ import com.lollipop.blindlauncher.view.RotaryView
 
 class LauncherActivity : AppCompatActivity(),
     TtsHelper.OnInitListener,
-    AppLaunchHelper.OnAppListSortChangedListener,
+    AppLaunchHelper.Listener,
     RotaryView.GestureListener {
 
     private val binding: ActivityLauncherBinding by lazyBind()
@@ -16,17 +17,20 @@ class LauncherActivity : AppCompatActivity(),
     private val ttsHelper by lazy {
         TtsHelper(this, this)
     }
-
     private val vibrateHelper by lazy {
         VibrateHelper(this)
     }
-
     private val appLaunchHelper by lazy {
         AppLaunchHelper(this, this)
+    }
+    private val settings by lazy {
+        LSettings(this)
     }
 
     private var selectedIndex = -1
     private var selectedApp: AppLaunchHelper.AppInfo? = null
+
+    private val volumeUpTapHelper = MultipleTapHelper(invokeCount = 5, callback = ::openVoice)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowInsetsHelper.initWindowFlag(this)
@@ -64,9 +68,18 @@ class LauncherActivity : AppCompatActivity(),
                 selectedApp = null
             }
             setText(label)
-            ttsHelper.say(label)
+            say(label)
             vibrateHelper.startUp(VibrateHelper.Vibrate.SELECTED)
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+                volumeUpTapHelper.onTap()
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun setText(value: CharSequence) {
@@ -86,9 +99,19 @@ class LauncherActivity : AppCompatActivity(),
     }
 
     override fun onTtsReady() {
-        ttsHelper.say(R.string.tts_ready)
+        say(R.string.tts_ready)
         if (appLaunchHelper.isNotEmpty()) {
-            ttsHelper.say(R.string.app_list_ready, false)
+            say(R.string.app_list_ready, false)
+        }
+    }
+
+    private fun say(resId: Int, clear: Boolean = true) {
+        say(getString(resId), clear)
+    }
+
+    private fun say(text: String, clear: Boolean = true) {
+        if (settings.isOpenVoice) {
+            ttsHelper.say(text, clear)
         }
     }
 
@@ -101,6 +124,20 @@ class LauncherActivity : AppCompatActivity(),
         selectedIndex = -1
         selectedApp = null
         setText("")
+    }
+
+    override fun callVoiceOff() {
+        if (settings.isOpenVoice) {
+            say(R.string.voice_off_hint)
+            settings.isOpenVoice = false
+        }
+    }
+
+    private fun openVoice() {
+        if (!settings.isOpenVoice) {
+            settings.isOpenVoice = true
+            say(R.string.tts_ready)
+        }
     }
 
     override fun onTouchDown() {

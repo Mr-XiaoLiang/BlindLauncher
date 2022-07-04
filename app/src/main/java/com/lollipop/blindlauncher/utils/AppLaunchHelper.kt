@@ -2,6 +2,7 @@ package com.lollipop.blindlauncher.utils
 
 import android.content.Context
 import androidx.room.Room
+import com.lollipop.blindlauncher.R
 import com.lollipop.blindlauncher.db.AppUsage
 import com.lollipop.blindlauncher.db.AppUsageDatabase
 import com.lollipop.blindlauncher.doAsync
@@ -9,9 +10,13 @@ import com.lollipop.blindlauncher.onUI
 
 class AppLaunchHelper(
     private val context: Context,
-    private val onAppListSortChangedListener: OnAppListSortChangedListener,
+    private val listener: Listener,
     private val appInfoList: ArrayList<AppInfo> = ArrayList()
 ) : List<AppLaunchHelper.AppInfo> by appInfoList {
+
+    companion object {
+        const val ACTION_VOICE_OFF = "ACTION_VOICE_OFF"
+    }
 
     private val db = Room.databaseBuilder(
         context.applicationContext,
@@ -37,6 +42,14 @@ class AppLaunchHelper(
         synchronized(appInfoList) {
             appInfoList.clear()
             appInfoList.addAll(tempList)
+            appInfoList.add(
+                appInfoList.size / 2,
+                AppInfo(
+                    ACTION_VOICE_OFF,
+                    context.getString(R.string.voice_off),
+                    0
+                )
+            )
         }
         doAsync {
             val allUsage = db.usageDao().getAll()
@@ -47,13 +60,25 @@ class AppLaunchHelper(
                 appInfoList.sortBy { it.launchCount }
             }
             onUI {
-                onAppListSortChangedListener.onAppListSortChanged()
+                listener.onAppListSortChanged()
             }
         }
     }
 
     fun launch(info: AppInfo?): LaunchResult {
         info ?: return LaunchResult.APP_NOT_FOUND
+        return when (info.pkgName) {
+            ACTION_VOICE_OFF -> {
+                listener.callVoiceOff()
+                LaunchResult.SUCCESS
+            }
+            else -> {
+                launchApp(info)
+            }
+        }
+    }
+
+    private fun launchApp(info: AppInfo): LaunchResult {
         info.launchCount++
         doAsync {
             db.usageDao().updateOrInsert(info.pkgName, info.launchCount)
@@ -85,8 +110,9 @@ class AppLaunchHelper(
         ERROR
     }
 
-    fun interface OnAppListSortChangedListener {
+    interface Listener {
         fun onAppListSortChanged()
+        fun callVoiceOff()
     }
 
 }

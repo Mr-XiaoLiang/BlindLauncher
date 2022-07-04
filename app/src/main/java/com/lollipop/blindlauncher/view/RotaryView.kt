@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.lollipop.blindlauncher.R
 import com.lollipop.blindlauncher.utils.AnimationHelper
+import com.lollipop.blindlauncher.utils.MultipleTapHelper
 
 class RotaryView(
     context: Context, attrs: AttributeSet?, style: Int
@@ -85,7 +86,7 @@ class RotaryView(
     var partitionsCount: Int = 6
 
     private var blockIndex = BLOCK_INDEX_NONE
-    private val doubleTapWrapper = DoubleTapWrapper(::onDoubleTap)
+    private val doubleTapWrapper = MultipleTapHelper(invokeCount = 2, callback = ::onDoubleTap)
 
     init {
         setOnClickListener(doubleTapWrapper)
@@ -201,21 +202,6 @@ class RotaryView(
         fun onTouchUp()
         fun onPartitionsChange(clockwise: Boolean)
         fun onDoubleTap()
-    }
-
-    private class DoubleTapWrapper(private val onDoubleTap: () -> Unit) : View.OnClickListener {
-
-        private var lastClickTime = 0L
-
-        override fun onClick(v: View?) {
-            val now = System.currentTimeMillis()
-            lastClickTime = if ((now - lastClickTime) < DOUBLE_TAP_INTERVAL) {
-                onDoubleTap()
-                0L
-            } else {
-                now
-            }
-        }
     }
 
 }
