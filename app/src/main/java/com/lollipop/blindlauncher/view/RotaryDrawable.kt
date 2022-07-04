@@ -106,7 +106,7 @@ class RotaryDrawable : Drawable() {
         paint.shader = shader
         paint.alpha = turntableAlpha
         val saveCount = canvas.save()
-        canvas.rotate(angle, 0F, 0F)
+        canvas.rotate(angle, centerPoint.x, centerPoint.y)
         canvas.drawOval(ovalBounds, paint)
         canvas.restoreToCount(saveCount)
     }

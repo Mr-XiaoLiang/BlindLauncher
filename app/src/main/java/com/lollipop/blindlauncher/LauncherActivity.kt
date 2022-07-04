@@ -4,9 +4,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.blindlauncher.databinding.ActivityLauncherBinding
 import com.lollipop.blindlauncher.utils.*
+import com.lollipop.blindlauncher.view.RotaryView
 
-class LauncherActivity : AppCompatActivity(), TtsHelper.OnInitListener,
-    AppLaunchHelper.OnAppListSortChangedListener {
+class LauncherActivity : AppCompatActivity(),
+    TtsHelper.OnInitListener,
+    AppLaunchHelper.OnAppListSortChangedListener,
+    RotaryView.GestureListener {
 
     private val binding: ActivityLauncherBinding by lazyBind()
 
@@ -35,6 +38,9 @@ class LauncherActivity : AppCompatActivity(), TtsHelper.OnInitListener,
         // 初始化
         ttsHelper
         appLaunchHelper.init()
+
+        // 注册手势监听器
+        binding.rotaryView.setGestureListener(this)
     }
 
     override fun onResume() {
@@ -43,10 +49,6 @@ class LauncherActivity : AppCompatActivity(), TtsHelper.OnInitListener,
         appLaunchHelper.loadData()
         // 震动表示就绪
         vibrateHelper.startUp(VibrateHelper.Vibrate.SELECTED)
-
-//        binding.root.postDelayed({ selectedApp(1) }, 3000)
-
-//        binding.root.postDelayed({ appLaunchHelper.launch(selectedApp) }, 6000)
     }
 
     private fun selectedApp(index: Int) {
@@ -98,6 +100,38 @@ class LauncherActivity : AppCompatActivity(), TtsHelper.OnInitListener,
     override fun onAppListSortChanged() {
         selectedIndex = -1
         selectedApp = null
+        setText("")
+    }
+
+    override fun onTouchDown() {
+        vibrateHelper.startUp(VibrateHelper.Vibrate.TOUCH_DOWN)
+    }
+
+    override fun onTouchUp() {
+        vibrateHelper.startUp(VibrateHelper.Vibrate.TOUCH_UP)
+    }
+
+    override fun onPartitionsChange(clockwise: Boolean) {
+        var newIndex = if (clockwise) {
+            selectedIndex + 1
+        } else {
+            selectedIndex - 1
+        }
+        if (appLaunchHelper.isEmpty()) {
+            newIndex = -1
+        } else {
+            if (newIndex < 0) {
+                newIndex = appLaunchHelper.size - 1
+            }
+            if (newIndex > appLaunchHelper.size - 1) {
+                newIndex = 0
+            }
+        }
+        selectedApp(newIndex)
+    }
+
+    override fun onDoubleTap() {
+        appLaunchHelper.launch(selectedApp)
     }
 
 }
