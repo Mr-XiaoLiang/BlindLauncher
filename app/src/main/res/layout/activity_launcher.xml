@@ -29,8 +29,8 @@
         android:id="@+id/rotaryView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:runwayBackground="#32D5FFF9"
-        app:runwayColor="#D5FFF9"
+        app:runwayBackground="@color/rotaryBackground"
+        app:runwayColor="@color/rotaryColor"
         app:runwayWidth="16dp" />
 
 </FrameLayout>
