@@ -164,7 +164,10 @@ class LauncherActivity : AppCompatActivity(),
         val label = info?.label ?: getString(R.string.app_selected_none)
         setText(label)
         say(label)
-        vibrateHelper.startUp(VibrateHelper.Vibrate.SELECTED)
+        // 没有选中不要给出错误反馈
+        if (info != null) {
+            vibrateHelper.startUp(VibrateHelper.Vibrate.SELECTED)
+        }
     }
 
     /**

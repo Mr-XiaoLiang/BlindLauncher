@@ -5,6 +5,10 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 
+/**
+ * 震动辅助工具
+ * 提供预设的震动模式
+ */
 class VibrateHelper(
     private val context: Context
 ) {
@@ -35,9 +39,24 @@ class VibrateHelper(
     }
 
     enum class Vibrate(val timings: LongArray, val amplitudes: IntArray) {
+        /**
+         * 手指按下
+         */
         TOUCH_DOWN(longArrayOf(0, 50), intArrayOf(0, 128)),
+
+        /**
+         * 手指抬起
+         */
         TOUCH_UP(longArrayOf(0, 50), intArrayOf(0, 128)),
+
+        /**
+         * 选中
+         */
         SELECTED(longArrayOf(0, 100, 100, 50), intArrayOf(0, 255, 0, 128)),
+
+        /**
+         * 启动
+         */
         COMPLETE(longArrayOf(0, 100, 100, 100, 100, 100), intArrayOf(0, 128, 0, 128, 0, 128))
     }
 

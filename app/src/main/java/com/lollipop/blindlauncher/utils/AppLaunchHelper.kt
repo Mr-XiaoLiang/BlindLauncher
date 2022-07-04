@@ -8,6 +8,9 @@ import com.lollipop.blindlauncher.db.AppUsageDatabase
 import com.lollipop.blindlauncher.doAsync
 import com.lollipop.blindlauncher.onUI
 
+/**
+ * APP选择器
+ */
 class AppLaunchHelper(
     private val context: Context,
     private val listener: Listener,
@@ -22,6 +25,10 @@ class AppLaunchHelper(
      * 已选中的Index
      */
     private var selectedIndex = -1
+
+    /**
+     * 已选中的APP
+     */
     private var selectedApp: AppInfo? = null
 
     private val db = Room.databaseBuilder(
@@ -29,10 +36,16 @@ class AppLaunchHelper(
         AppUsageDatabase::class.java, "app_usage_database"
     ).build()
 
+    /**
+     * 初始化方法用于注册系统的应用安装与卸载事件
+     */
     fun init() {
         AppListHelper.registerPackageChangeReceiver(context)
     }
 
+    /**
+     * 加载数据，它会加载并更新app的列表并且按照使用频率排序
+     */
     fun loadData() {
         AppListHelper.loadAppInfo(context)
         val tempList = ArrayList<AppInfo>()
@@ -73,6 +86,9 @@ class AppLaunchHelper(
         }
     }
 
+    /**
+     * 启动当前选中的APP
+     */
     fun launch(): LaunchResult {
         val info = selectedApp
         info ?: return LaunchResult.APP_NOT_FOUND
@@ -120,10 +136,16 @@ class AppLaunchHelper(
         }
     }
 
+    /**
+     * 选中上一个
+     */
     fun selectLast() {
         onPartitionsChange(selectedIndex - 1)
     }
 
+    /**
+     * 选中下一个
+     */
     fun selectNext() {
         onPartitionsChange(selectedIndex + 1)
     }

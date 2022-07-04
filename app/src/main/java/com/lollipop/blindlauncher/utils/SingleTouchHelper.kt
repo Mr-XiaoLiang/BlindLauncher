@@ -3,6 +3,9 @@ package com.lollipop.blindlauncher.utils
 import android.view.MotionEvent
 import kotlin.math.abs
 
+/**
+ * 单指手势辅助工具
+ */
 class SingleTouchHelper(private val scaledTouchSlop: Int) {
 
     var touchX = 0F

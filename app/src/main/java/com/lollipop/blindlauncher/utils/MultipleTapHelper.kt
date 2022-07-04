@@ -2,6 +2,9 @@ package com.lollipop.blindlauncher.utils
 
 import android.view.View
 
+/**
+ * 多次事件的连续触发小工具
+ */
 class MultipleTapHelper(
     private val interval: Long = 300L,
     private val invokeCount: Int = 2,

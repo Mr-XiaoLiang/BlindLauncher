@@ -11,6 +11,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import java.lang.ref.WeakReference
 
+/**
+ * APP列表的原始数据集合对象
+ * 它是静态的，因为希望持续的保存数据，并且数据变化并不大
+ */
 object AppListHelper : List<AppListHelper.AppResolveInfo> {
 
     /**
