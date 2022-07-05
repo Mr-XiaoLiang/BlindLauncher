@@ -12,6 +12,8 @@ class LSettings(
 
     var isOpenVoice by def(true)
 
+    var isFirstLaunch  by def(true)
+
     fun def(def: Boolean): BooleanDelegate {
         return BooleanDelegate(preferences, def)
     }

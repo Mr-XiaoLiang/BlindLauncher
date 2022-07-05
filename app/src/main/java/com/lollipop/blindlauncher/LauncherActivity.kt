@@ -125,7 +125,11 @@ class LauncherActivity : AppCompatActivity(),
     override fun onTtsReady() {
         say(R.string.tts_ready)
         if (appLaunchHelper.isNotEmpty()) {
-            say(R.string.app_list_ready, false)
+            say(R.string.tts_app_list_ready, false)
+        }
+        if (settings.isFirstLaunch) {
+            say(R.string.tts_first_launch, false)
+            settings.isFirstLaunch = false
         }
     }
 
@@ -176,7 +180,7 @@ class LauncherActivity : AppCompatActivity(),
      */
     override fun callVoiceOff() {
         if (settings.isOpenVoice) {
-            say(R.string.voice_off_hint)
+            say(R.string.tts_voice_off_hint)
             settings.isOpenVoice = false
         }
     }
