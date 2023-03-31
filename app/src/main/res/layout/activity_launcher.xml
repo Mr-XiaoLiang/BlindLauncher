@@ -23,7 +23,8 @@
         android:layout_margin="5dp"
         android:gravity="center"
         android:text="@string/discover_light"
-        android:textColor="#AAA" />
+        android:textColor="#AAA"
+        android:textStyle="italic" />
 
     <com.lollipop.blindlauncher.view.RotaryView
         android:id="@+id/rotaryView"

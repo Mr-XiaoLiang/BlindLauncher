@@ -2,14 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <queries>
-        <intent >
-            <action android:name="android.intent.action.TTS_SERVICE"/>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
         </intent>
-        <intent >
-            <action android:name="android.intent.action.MAIN"/>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
         </intent>
     </queries>
 
@@ -22,12 +22,16 @@
         android:theme="@style/Theme.BlindLauncher"
         tools:targetApi="31">
         <activity
+            android:name=".HiddenListActivity"
+            android:exported="false" />
+        <activity
             android:name=".LauncherActivity"
-            android:exported="true"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.MONKEY" />

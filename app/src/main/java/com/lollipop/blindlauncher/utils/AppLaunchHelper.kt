@@ -1,7 +1,10 @@
 package com.lollipop.blindlauncher.utils
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.room.Room
+import com.lollipop.blindlauncher.BuildConfig
+import com.lollipop.blindlauncher.HiddenListActivity
 import com.lollipop.blindlauncher.R
 import com.lollipop.blindlauncher.db.AppUsage
 import com.lollipop.blindlauncher.db.AppUsageDatabase
@@ -18,7 +21,31 @@ class AppLaunchHelper(
 ) : List<AppLaunchHelper.AppInfo> by appInfoList {
 
     companion object {
-        const val ACTION_VOICE_OFF = "ACTION_VOICE_OFF"
+        fun getAppList(context: Context, localAction: Boolean): List<AppInfo> {
+            AppListHelper.loadAppInfo(context)
+            val tempList = ArrayList<AppInfo>()
+            AppListHelper.forEach {
+                tempList.add(
+                    AppInfo.Normal(
+                        it.pkgName,
+                        it.getLabel(context).toString(),
+                        0
+                    )
+                )
+            }
+            if (localAction) {
+                // 调试模式下放第一个，正常模式下放中间
+                val startIndex = if (BuildConfig.DEBUG) {
+                    0
+                } else {
+                    tempList.size / 2
+                }
+                BlindAction.values().forEach {
+                    tempList.add(startIndex, it.createAppInfo(context))
+                }
+            }
+            return tempList
+        }
     }
 
     /**
@@ -47,28 +74,10 @@ class AppLaunchHelper(
      * 加载数据，它会加载并更新app的列表并且按照使用频率排序
      */
     fun loadData() {
-        AppListHelper.loadAppInfo(context)
-        val tempList = ArrayList<AppInfo>()
-        AppListHelper.forEach {
-            tempList.add(
-                AppInfo(
-                    it.pkgName,
-                    it.getLabel(context).toString(),
-                    0
-                )
-            )
-        }
+        val tempList = getAppList(context, true)
         synchronized(appInfoList) {
             appInfoList.clear()
             appInfoList.addAll(tempList)
-            appInfoList.add(
-                appInfoList.size / 2,
-                AppInfo(
-                    ACTION_VOICE_OFF,
-                    context.getString(R.string.voice_off),
-                    0
-                )
-            )
         }
         doAsync {
             val allUsage = db.usageDao().getAll()
@@ -92,15 +101,19 @@ class AppLaunchHelper(
     fun launch(): LaunchResult {
         val info = selectedApp
         info ?: return LaunchResult.APP_NOT_FOUND
-        return when (info.pkgName) {
-            ACTION_VOICE_OFF -> {
+        val blindAction = BlindAction.findByAction(info.pkgName) ?: return launchApp(info)
+        when (blindAction) {
+            BlindAction.VOICE_OFF -> {
                 listener.callVoiceOff()
                 LaunchResult.SUCCESS
             }
-            else -> {
-                launchApp(info)
+
+            BlindAction.HIDDEN_LIST -> {
+                HiddenListActivity.start(context)
+                LaunchResult.SUCCESS
             }
         }
+        return LaunchResult.SUCCESS
     }
 
     private fun launchApp(info: AppInfo): LaunchResult {
@@ -165,11 +178,46 @@ class AppLaunchHelper(
         selectedApp(newIndex)
     }
 
-    class AppInfo(
+    sealed class AppInfo(
         val pkgName: String,
         val label: String,
         var launchCount: Int
-    )
+    ) {
+
+        class Normal(
+            pkgName: String,
+            label: String,
+            launchCount: Int = 0
+        ) : AppInfo(pkgName, label, launchCount)
+
+        class Blind(
+            pkgName: String,
+            label: String,
+            launchCount: Int = 0
+        ) : AppInfo(pkgName, label, launchCount)
+
+    }
+
+    enum class BlindAction(
+        @StringRes
+        val label: Int,
+        val action: String
+    ) {
+
+        VOICE_OFF(R.string.voice_off, "ACTION_VOICE_OFF"),
+        HIDDEN_LIST(R.string.hidden_list, "ACTION_HIDDEN_LIST");
+
+        fun createAppInfo(context: Context): AppInfo {
+            return AppInfo.Blind(action, context.getString(label))
+        }
+
+        companion object {
+            fun findByAction(action: String): BlindAction? {
+                return values().find { it.action == action }
+            }
+        }
+
+    }
 
     enum class LaunchResult {
         SUCCESS,

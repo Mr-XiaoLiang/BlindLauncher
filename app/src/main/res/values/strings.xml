@@ -5,10 +5,12 @@
     <string name="tts_not_support_chinese">TTS not support, 文字转语音不被支持</string>
     <string name="tts_init_error">TTS文字转语音出错，可能设备不支持</string>
     <string name="app_selected_none">应用未选中</string>
-    <string name="discover_light">愿我们都成为彼此的星星</string>
+    <string name="discover_light">power by Lollipop</string>
 
     <string name="voice_off">关闭语音提示</string>
     <string name="tts_voice_off_hint">语音提示已关闭，你可以快速且连续的按音量键，来再次开启语音提示</string>
+
+    <string name="hidden_list">隐藏应用</string>
 
     <string name="tts_first_launch">您可以在屏幕上画圈来选择应用，并且双击屏幕来启动选中的应用</string>
 </resources>
