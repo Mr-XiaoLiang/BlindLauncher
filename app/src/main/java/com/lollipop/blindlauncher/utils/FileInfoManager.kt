@@ -27,21 +27,33 @@ abstract class FileInfoManager {
     protected fun readArrayFromFile(
         file: File,
         emptyData: (error: Boolean) -> Unit,
-        itemReader: (item: JSONObject) -> Unit
+        itemReader: (item: Any) -> Unit
     ) {
         try {
             if (!file.exists()) {
                 emptyData(false)
                 return
             }
-            val value = TxtHelper.readFromFile(file)
-            val jsonArray = JSONArray(value)
-            for (i in 0 until jsonArray.length()) {
-                val obj = jsonArray.optJSONObject(i) ?: continue
-                try {
-                    itemReader(obj)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
+            val result = TxtHelper.readFromFile(file)
+            when (result) {
+                is TxtHelper.Result.Error -> {
+                    emptyData(true)
+                }
+
+                is TxtHelper.Result.Response -> {
+                    val jsonArray = JSONArray(result.value)
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.opt(i) ?: continue
+                        try {
+                            itemReader(obj)
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
+                TxtHelper.Result.Successful -> {
+                    emptyData(false)
                 }
             }
         } catch (e: Throwable) {

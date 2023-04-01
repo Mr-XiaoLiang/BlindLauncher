@@ -11,10 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.blindlauncher.databinding.ActivityHiddenListBinding
 import com.lollipop.blindlauncher.databinding.ItemHiddenListAppBinding
+import com.lollipop.blindlauncher.db.HiddenInfoManager
 import com.lollipop.blindlauncher.utils.AppLaunchHelper
 import com.lollipop.blindlauncher.utils.FileInfoManager
 import com.lollipop.blindlauncher.utils.WindowInsetsHelper
 import com.lollipop.blindlauncher.utils.fixInsetsByPadding
+import org.json.JSONArray
+import java.io.File
 
 class HiddenListActivity : AppCompatActivity() {
 
@@ -49,26 +52,29 @@ class HiddenListActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     private fun loadData() {
         val appList = AppLaunchHelper.getAppList(this, false)
-
         data.clear()
         data.addAll(appList)
         appAdapter.notifyDataSetChanged()
+        HiddenInfoManager.load {
+            appAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun isAppChecked(info: AppLaunchHelper.AppInfo): Boolean {
-        TODO()
+        return HiddenInfoManager.has(info.pkgName)
     }
 
     private fun onAppCheckedChanged(info: AppLaunchHelper.AppInfo, checked: Boolean) {
-        TODO()
+        if (checked) {
+            HiddenInfoManager.add(info.pkgName)
+        } else {
+            HiddenInfoManager.remove(info.pkgName)
+        }
     }
 
-    private class HiddenInfoManager: FileInfoManager() {
-
-        override fun init(context: Context) {
-            TODO("Not yet implemented")
-        }
-
+    override fun onPause() {
+        super.onPause()
+        HiddenInfoManager.save()
     }
 
     private class AppAdapter(

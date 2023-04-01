@@ -8,6 +8,7 @@ import com.lollipop.blindlauncher.HiddenListActivity
 import com.lollipop.blindlauncher.R
 import com.lollipop.blindlauncher.db.AppUsage
 import com.lollipop.blindlauncher.db.AppUsageDatabase
+import com.lollipop.blindlauncher.db.HiddenInfoManager
 import com.lollipop.blindlauncher.doAsync
 import com.lollipop.blindlauncher.onUI
 
@@ -63,10 +64,13 @@ class AppLaunchHelper(
         AppUsageDatabase::class.java, "app_usage_database"
     ).build()
 
+    private var myPackageName = ""
+
     /**
      * 初始化方法用于注册系统的应用安装与卸载事件
      */
     fun init() {
+        myPackageName = context.packageName
         AppListHelper.registerPackageChangeReceiver(context)
     }
 
@@ -74,10 +78,26 @@ class AppLaunchHelper(
      * 加载数据，它会加载并更新app的列表并且按照使用频率排序
      */
     fun loadData() {
+        HiddenInfoManager.load {
+            fetchAppInfo()
+        }
+    }
+
+    private fun fetchAppInfo() {
         val tempList = getAppList(context, true)
         synchronized(appInfoList) {
             appInfoList.clear()
-            appInfoList.addAll(tempList)
+            for (appInfo in tempList) {
+                if (HiddenInfoManager.has(appInfo.pkgName)) {
+                    // 在黑名单，不添加到列表
+                    continue
+                }
+                if (appInfo.pkgName == myPackageName) {
+                    // 自己，不添加到列表
+                    continue
+                }
+                appInfoList.add(appInfo)
+            }
         }
         doAsync {
             val allUsage = db.usageDao().getAll()
